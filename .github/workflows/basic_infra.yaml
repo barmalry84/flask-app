@@ -42,8 +42,8 @@ jobs:
       - name: Terraform plan
         run: |
             cd iac/basic
-            terraform init
-            terraform plan            
+            terraform init -var-file "../configs/basic/basic.tfvars"
+            terraform plan -var-file "../configs/basic/basic.tfvars"            
 
     terraform_apply:
       if: github.ref == 'refs/heads/main' # This ensures apply only runs for the main branch
@@ -54,5 +54,4 @@ jobs:
       - name: Terraform Apply
         run: |
           cd iac/basic
-          terraform apply -auto-approve
-          
+          terraform apply -var-file "../configs/basic/basic.tfvars" -auto-approve
