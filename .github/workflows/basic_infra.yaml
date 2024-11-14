@@ -1,6 +1,5 @@
 name: Basic infra CI/CD
 on:
-    workflow_dispatch:
     push:
       paths:
         - 'iac/basic/**'
