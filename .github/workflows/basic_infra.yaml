@@ -68,4 +68,5 @@ jobs:
       - name: Terraform Apply
         run: |
           cd iac/basic
+          terraform init -var-file "../configs/basic/basic.tfvars"
           terraform apply -var-file "../configs/basic/basic.tfvars" -auto-approve
