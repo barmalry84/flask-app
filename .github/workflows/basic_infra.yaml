@@ -1,6 +1,8 @@
 name: Basic infra CI/CD
 on:
     push:
+      branches:
+        - '**'
       paths:
         - 'iac/basic/**'
         - 'iac/configs/basic/**'
