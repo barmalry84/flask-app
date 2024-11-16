@@ -35,10 +35,11 @@ resource "aws_lb" "ecs_alb" {
 
 # Define the Target Group
 resource "aws_lb_target_group" "ecs_target_group" {
-  name     = "${local.service_name}-tg"
-  port     = 5010
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.main_vpc.id
+  name        = "${local.service_name}-tg"
+  target_type = "ip"
+  port        = 5010
+  protocol    = "HTTP"
+  vpc_id      = data.aws_vpc.main_vpc.id
 
   health_check {
     path                = "/"
