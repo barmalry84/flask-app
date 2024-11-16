@@ -1,0 +1,73 @@
+name: App structure
+on:
+    push:
+      branches:
+        - '**'
+      paths:
+        - 'iac/app-structure/**'
+        - 'iac/configs/app-structure/**'
+
+jobs:
+    terraform_checks:
+      name: Terraform Format, Lint
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "eu-west-1"
+
+      - name: Terraform Format Check
+        run: |
+          cd iac/app-structure
+          terraform fmt -check
+
+      - name: Install tflint
+        run: |
+          wget https://github.com/terraform-linters/tflint/releases/download/v0.29.0/tflint_linux_amd64.zip
+          unzip tflint_linux_amd64.zip
+          sudo mv tflint /usr/bin/
+          cd iac/app-structure
+          tflint
+
+      - name: Terraform plan
+        run: |
+            cd iac/app-structure
+            terraform init -var-file "../configs/app-structure/app-structure.tfvars"
+            terraform plan -var-file "../configs/app-structure/app-structure.tfvars"  
+
+    terraform_apply:
+      if: github.ref == 'refs/heads/main' # This ensures apply only runs for the main branch
+      name: Terraform Apply
+      needs: terraform_checks
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "eu-west-1"
+      - name: Terraform Apply
+        run: |
+          cd iac/app-structure
+          terraform init -var-file "../configs/app-structure/app-structure.tfvars"
+          terraform apply -var-file "../configs/app-structure/app-structure.tfvars" -auto-approve
