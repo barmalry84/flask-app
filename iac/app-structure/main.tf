@@ -139,6 +139,12 @@ resource "aws_ecs_service" "service" {
     security_groups = [aws_security_group.fargate.id]
   }
 
+  load_balancer {
+    target_group_arn = aws_lb_target_group.ecs_target_group.arn
+    container_name   = "flask-app"
+    container_port   = 5010
+  }
+
   tags = merge(var.tags, { "Name" = local.service_name }, { "Cluster" = local.cluster_name })
 }
 
