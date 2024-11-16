@@ -9,4 +9,4 @@ task_mem = 512
 docker_image = "746669199028.dkr.ecr.eu-west-1.amazonaws.com/flask-app"
 docker_image_version = "0.0.5"
 task_count = 3
-region = eu-west-1
+region = "eu-west-1"
