@@ -43,7 +43,7 @@ jobs:
       - name: Terraform plan
         run: |
             cd iac/app-structure
-            terraform init -var-file "../configs/app-structure/app-structure.tfvars"
+            terraform init
             terraform plan -var-file "../configs/app-structure/app-structure.tfvars"  
 
     terraform_apply:
@@ -69,5 +69,5 @@ jobs:
       - name: Terraform Apply
         run: |
           cd iac/app-structure
-          terraform init -var-file "../configs/app-structure/app-structure.tfvars"
+          terraform init
           terraform apply -var-file "../configs/app-structure/app-structure.tfvars" -auto-approve

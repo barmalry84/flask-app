@@ -31,3 +31,31 @@ jobs:
       run: |
         docker build -f app/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG app
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+  
+  application_deployment:
+      name: Terraform Apply
+      needs: build-and-push
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "eu-west-1"
+
+      - name: Terraform Apply
+        env:
+          IMAGE_TAG: ${{ github.ref_name }}
+        run: |
+          cd iac/app-structure
+          terraform init
+          terraform apply -var="docker_image_version=$IMAGE_TAG" -var-file "../configs/app-structure/app-structure.tfvars" -auto-approve
