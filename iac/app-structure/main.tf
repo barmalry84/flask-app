@@ -101,53 +101,6 @@ resource "aws_security_group_rule" "egress" {
   security_group_id = aws_security_group.fargate.id
 }
 
-### Task definition
-resource "aws_ecs_task_definition" "task" {
-  family                   = local.task_name
-  container_definitions    = data.template_file.task.rendered
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = var.task_cpu
-  memory                   = var.task_mem
-  network_mode             = "awsvpc"
-  task_role_arn            = aws_iam_role.ecs_task_role.arn
-  execution_role_arn       = aws_iam_role.ecs_task_role.arn
-  tags                     = merge(var.tags, { "Name" = local.task_name }, { "Cluster" = local.cluster_name })
-}
-
-data "template_file" "task" {
-  template = templatefile("${path.module}/container-definitions/container.json.tpl", {
-
-    name        = "flask-app"
-    log_group   = local.cw_log_group_name
-    app_image   = var.docker_image
-    app_version = var.docker_image_version
-  })
-}
-
-# Service
-resource "aws_ecs_service" "service" {
-
-  name                              = local.service_name
-  launch_type                       = "FARGATE"
-  cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.task.arn
-  desired_count                     = var.task_count
-  health_check_grace_period_seconds = 60
-
-  network_configuration {
-    subnets         = data.aws_subnets.private.ids
-    security_groups = [aws_security_group.fargate.id]
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.ecs_target_group.arn
-    container_name   = "flask-app"
-    container_port   = 5010
-  }
-
-  tags = merge(var.tags, { "Name" = local.service_name }, { "Cluster" = local.cluster_name })
-}
-
 
 
 
