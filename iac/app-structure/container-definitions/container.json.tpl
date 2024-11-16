@@ -16,8 +16,8 @@ ${jsonencode([
       "essential": true,
       "portMappings": [
       {
-          "hostPort": "5010",
-          "containerPort": "5010",
+          "hostPort": 5010,
+          "containerPort": 5010,
           "protocol": "tcp"
       }
       ]
