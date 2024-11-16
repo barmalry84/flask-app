@@ -58,4 +58,4 @@ jobs:
         run: |
           cd iac/app-structure
           terraform init
-          terraform apply -var="docker_image_version=$IMAGE_TAG" -var-file "../configs/app-structure/app-structure.tfvars" -auto-approve
+          terraform apply -var-file "../configs/app-structure/app-structure.tfvars" -var="docker_image_version=$IMAGE_TAG" -auto-approve
